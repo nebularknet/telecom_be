@@ -11,12 +11,12 @@ const AdminRegister = async (req, res) => {
         return res.status(400).json({ message: 'Request body is missing or empty.' });
     }
 
-    const { email, password } = req.body;
+    const { fullname,email, password } = req.body;
 
     // Basic validation - Ensure required fields are provided
-    if (!email || !password) {
+    if (!fullname||!email || !password) {
         // Log the received body for debugging partial data issues
-        console.warn('Admin registration validation failed: Missing fields.', { email: !!email, password: !!password });
+        console.warn('Admin registration validation failed: Missing fields.', { fullname:!!fullname,email: !!email, password: !!password });
         return res.status(400).json({ message: 'Please provide fullname, email, and password.' });
     }
 
@@ -35,6 +35,7 @@ const AdminRegister = async (req, res) => {
 
         // Create a new user instance with hashed password and admin role
         const newUser = new UserSchemas({
+            fullname,
             email,
             password: hashedPassword,
             role: 'admin', // Explicitly setting role
