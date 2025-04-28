@@ -12,10 +12,10 @@ const AdminLogin = async (req, res) => {
         return res.status(400).json({ message: 'Request body is missing or empty.' });
     }
 
-    const { fullname,email, password } = req.body;
+    const { email, password } = req.body;
 
     // Validate input
-    if (!fullname||!email || !password) {
+    if (!email || !password) {
         console.warn('Admin login validation failed: Missing email or password.');
         return res.status(400).json({ message: 'Email and password are required.' });
     }
@@ -67,7 +67,6 @@ const AdminLogin = async (req, res) => {
             token: token,
             user: { // Return only necessary, non-sensitive user info
                 id: user._id,
-                fullname: user.fullname, // fullname is commented out in the schema, avoid sending if not present
                 email: user.email,
                 role: user.role
             }
