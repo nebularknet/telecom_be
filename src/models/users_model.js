@@ -18,20 +18,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters long'], // Example minimum length
+        select: false, // Exclude password from default query results
     },
     role: {
         type: String,
         enum: ['user', 'admin', 'support'], // Example roles
         default: 'user',
     },
-    created_at: {
-        type: Date,
-        default: Date.now,
-    },
-    updated_at: {
-        type: Date,
-        default: Date.now,
-    },
+    // created_at and updated_at will be handled by the timestamps option below
 },
     {
         timestamps:

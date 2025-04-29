@@ -1,5 +1,5 @@
 const UserSchemas = require('../../models/users_model');
-const bcrypy = require('bcryptjs');
+const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 
@@ -31,8 +31,8 @@ const AdminLogin = async (req, res) => {
              return res.status(401).json({ message: 'Invalid credentials or insufficient permissions.' });
         }
 
-        // Compare passwords using the imported bcryptjs library (aliased as bcrypy)
-        const isMatch = await bcrypy.compare(password, user.password);
+        // Compare passwords using the imported bcryptjs library
+        const isMatch = await bcryptjs.compare(password, user.password);
         if (!isMatch) {
             console.warn(`Admin login failed: Incorrect password for email ${email}`);
             // Use 401 Unauthorized for authentication failures

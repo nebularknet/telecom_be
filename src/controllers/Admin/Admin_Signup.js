@@ -1,5 +1,5 @@
 const UserSchemas = require('../../models/users_model');
-const bcrypy = require('bcryptjs');
+const bcryptjs = require('bcryptjs');
 
 // Admin Register
 const AdminRegister = async (req, res) => {
@@ -30,8 +30,8 @@ const AdminRegister = async (req, res) => {
         }
 
         // Generate salt and hash the password
-        const salt = await bcrypy.genSalt(10);
-        const hashedPassword = await bcrypy.hash(password, salt);
+        const salt = await bcryptjs.genSalt(10);
+        const hashedPassword = await bcryptjs.hash(password, salt);
 
         // Create a new user instance with hashed password and admin role
         const newUser = new UserSchemas({
