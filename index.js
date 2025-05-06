@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const mongoDBConnect = require('./src/config/mongodb.js');
 dotenv.config();
 
-
+// test
 mongoDBConnect();
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
