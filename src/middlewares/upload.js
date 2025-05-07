@@ -19,11 +19,14 @@ const transformDataToSchema = (data) => {
         throw new Error("Invalid record format: Expected an object.");
     }
     return {
-        phone_number: data.phoneNumber || data.phone_number || '',
-        country: data.country || '',
-        carrier: data.carrier || '',
-        type: data.type || '',
-        region: data.region || '',
+        phoneNumber: data["E164 number"] || data["Int. number"] || data["Local number"] || '', // Use E164, fallback to Int. or Local
+        country: data.Country || '', // Source from 'Country' in input JSON
+        carrier: data.Carrier || '', // Source from 'Carrier' in input JSON
+        type: data.Type || '',       // Source from 'Type' in input JSON
+        region: data.Region || '',     // Source from 'Region' in input JSON
+        // Adding new fields based on file_context_0 and common needs
+        valid: typeof data.Valid === 'boolean' ? data.Valid : false, // Source from 'Valid', default to false
+        dialCode: data["Dial code"] || '', // Source from 'Dial code' in input JSON
     };
 };
 
