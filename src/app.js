@@ -3,6 +3,7 @@ const UserRouting = require("./routes/user_route");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const UploadFile= require('../src/middlewares/upload')
+const veriphonenumber = require('./routes/client/phonenumberRoute')
 dotenv.config();
 const app = express();
 app.options('*any',function(req,res,next){
@@ -24,5 +25,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", UserRouting);
+app.use('/api',veriphonenumber)
 app.post('/upload',UploadFile)
 module.exports = app;

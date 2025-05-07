@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 
 // Admin Login
-const AdminLogin = async (req, res) => {
+const admin_login = async (req, res) => {
     // Ensure req.body exists
     if (!req.body) {
         console.error('Admin login error: Request body is missing or empty.');
@@ -79,4 +79,4 @@ const AdminLogin = async (req, res) => {
     }
 };
 
-module.exports = AdminLogin
+module.exports = admin_login
