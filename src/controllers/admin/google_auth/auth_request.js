@@ -14,8 +14,8 @@ const handleAuthRequest = async (req, res, next) => {
   const redirectURL = 'http://127.0.0.1:3000/api/user/oauth'; // Corrected path based on user_route.js and google_oauth.js
 
   const oAuth2Client = new OAuth2Client(
-    process.env.CLIENT_ID, // Ensure CLIENT_ID is set
-    process.env.CLIENT_SECRET, // Ensure CLIENT_SECRET is set
+    process.env.GOOGLE_CLIENTID, // Ensure GOOGLE_CLIENTID is set
+    process.env.GOOGLE_SERECTID, // Ensure GOOGLE_SERECTID is set
     redirectURL
   );
 
