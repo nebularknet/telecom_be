@@ -22,15 +22,15 @@ const veriphoneNumberSearch = async (req, res) => {
     // Prepare the response object to match the veriphone.io format exactly.
     // Exclude the internal MCCMNCData field from the response.
     const apiResponse = {
-      Valid: validationResult.Valid,
-      Country: validationResult.Country,
-      Carrier: validationResult.Carrier,
-      Type: validationResult.Type,
-      "Int. number": validationResult["Int. number"],
-      "Local number": validationResult["Local number"],
-      "E164 number": validationResult["E164 number"],
-      Region: validationResult.Region,
-      "Dial code": validationResult["Dial code"],
+      "Valid": validationResult.Valid,
+      "Country": validationResult.Country,
+      "Carrier": validationResult.Carrier,
+      "Type": validationResult.Type,
+      "Int_number": validationResult["Int. number"],
+      "Local_number": validationResult["Local number"],
+      "E164_number": validationResult["E164 number"],
+      "Region": validationResult.Region,
+      "Dial_code": validationResult["Dial code"],
       // MCCMNCData is intentionally excluded from the API response
     };
 

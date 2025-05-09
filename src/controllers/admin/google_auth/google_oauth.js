@@ -27,10 +27,10 @@ const handleGoogleOAuth = async (req, res, next) => {
 
   try {
     // Ensure this redirectURL matches exactly what's configured in your Google Cloud Console
-    const redirectURL = "http://127.0.0.1:3000/api/user/oauth";
+    const redirectURL = "http://localhost:3000/api/user/oauth";
     const oAuth2Client = new OAuth2Client(
-      process.env.CLIENT_ID, // Make sure CLIENT_ID is set in your .env
-      process.env.CLIENT_SECRET, // Make sure CLIENT_SECRET is set in your .env
+      process.env.MUGOOGLE_CLIENTID, // Make sure CLIENT_ID is set in your .env
+      process.env.MUGOOGLE_SERECTID, // Make sure CLIENT_SECRET is set in your .env
       redirectURL // Correct third argument
     );
     const r = await oAuth2Client.getToken(code);

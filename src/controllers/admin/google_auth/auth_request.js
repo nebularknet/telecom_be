@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+  
 dotenv.config(); // Load environment variables from .env file
 
 const { OAuth2Client } = require("google-auth-library");
@@ -11,11 +12,11 @@ const handleAuthRequest = async (req, res, next) => {
 
   // Ensure this redirectURL matches the one used in the OAuth callback handler
   // AND the one registered in Google Cloud Console
-  const redirectURL = "http://127.0.0.1:3000/api/user/oauth"; // Corrected path based on user_route.js and google_oauth.js
+  const redirectURL = "http://localhost:3000/api/user/oauth"; // Corrected path based on user_route.js and google_oauth.js
 
   const oAuth2Client = new OAuth2Client(
-    process.env.GOOGLE_CLIENTID, // Ensure GOOGLE_CLIENTID is set
-    process.env.GOOGLE_SERECTID, // Ensure GOOGLE_SERECTID is set
+    process.env.MUGOOGLE_CLIENTID, // Ensure GOOGLE_CLIENTID is set
+    process.env.MUGOOGLE_SERECTID, // Ensure GOOGLE_SERECTID is set
     redirectURL
   );
 
