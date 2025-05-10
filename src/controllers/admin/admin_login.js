@@ -3,7 +3,7 @@ const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // Admin Login
-const admin_login = async (req, res) => {
+const adminLogin = async (req, res) => { // Renamed to adminLogin
   // Ensure req.body exists
   if (!req.body) {
     console.error("Admin login error: Request body is missing or empty.");
@@ -47,6 +47,8 @@ const admin_login = async (req, res) => {
 
     // Check if JWT_SECRET is available
     const jwtSecret = process.env.JWT_SECRET;
+    const jwtExpiresIn = process.env.JWT_EXPIRES_IN || '1h'; // Get expiration from env or default to 1h
+
     if (!jwtSecret) {
       console.error(
         "JWT_SECRET environment variable is not set. Cannot generate token."
@@ -65,7 +67,7 @@ const admin_login = async (req, res) => {
     const token = jwt.sign(
       payload,
       jwtSecret,
-      { expiresIn: "1h" } // Token expires in 1 hour - adjust as needed
+      { expiresIn: jwtExpiresIn } // Use configurable expiration
     );
 
     // Send success response with token
@@ -87,4 +89,4 @@ const admin_login = async (req, res) => {
   }
 };
 
-module.exports = admin_login;
+module.exports = adminLogin; // Updated module export

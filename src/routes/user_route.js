@@ -10,6 +10,6 @@ const authrouter = express.Router();
 authrouter.post('/admin/signup',AdminSignup)
 authrouter.post('/admin/login',AdminLogin)
 authrouter.post('/request',AdminGoogleSignR)
-authrouter.post('/oauth',AdminGoogleOAuth)
+authrouter.get('/oauth',AdminGoogleOAuth) // Changed from post to get
 
 module.exports=authrouter
