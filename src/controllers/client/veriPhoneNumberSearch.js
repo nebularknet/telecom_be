@@ -31,7 +31,7 @@ const veriphoneNumberSearch = async (req, res) => {
       "E164_number": validationResult["E164 number"],
       "Region": validationResult.Region,
       "Dial_code": validationResult["Dial code"],
-      // MCCMNCData is intentionally excluded from the API response
+      "MCCMNCData": validationResult.MCCMNCData,
     };
 
     // Send the validation result back in the desired format

@@ -22,8 +22,8 @@ const UserSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin', 'support'], // Example roles
-        default: 'user',
+        enum: ['client', 'admin'], // Example roles
+        default: 'client',
     },
     // created_at and updated_at will be handled by the timestamps option below
 },

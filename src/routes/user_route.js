@@ -1,8 +1,8 @@
-const express = require('express')
-const AdminLogin = require('../controllers/admin/admin_login')
-const AdminSignup = require('../controllers/admin/admin_signup')
-const AdminGoogleSignR = require ('../controllers/admin/google_auth/auth_request')
-const AdminGoogleOAuth = require ('../controllers/admin/google_auth/google_oauth')
+const express = require('express');
+const AdminLogin = require('../controllers/auth/admin_login');
+const AdminSignup = require('../controllers/auth/admin_signup');
+const AdminGoogleSignR = require ('../controllers/auth/google_auth/auth_request');
+const AdminGoogleOAuth = require ('../controllers/auth/google_auth/google_oauth');
 const authrouter = express.Router();
 
 
