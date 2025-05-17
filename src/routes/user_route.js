@@ -5,8 +5,6 @@ const AdminGoogleSignR = require ('../controllers/auth/google_auth/auth_request'
 const AdminGoogleOAuth = require ('../controllers/auth/google_auth/google_oauth');
 const authrouter = express.Router();
 
-
-
 authrouter.post('/admin/signup',AdminSignup)
 authrouter.post('/admin/login',AdminLogin)
 authrouter.post('/request',AdminGoogleSignR)

@@ -1,9 +1,9 @@
 const express = require("express");
 const morgan = require('morgan'); // Import morgan
-const userRouter = require("./routes/user_route"); // Renamed from UserRouting
 const cors = require("cors");
+const userRouter = require("./routes/user_route"); // Renamed from UserRouting
 const phoneNumberRouter = require('./routes/client/phonenumberRoute'); // Renamed from veriphonenumber
-const uploadRouter = require('./routes/uploadRoute'); // Import the new upload router
+const uploadRouter = require('./routes/upload_file_route'); // Import the new upload router
 
 const app = express();
 
@@ -30,8 +30,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRouter); // Use renamed variable
-app.use('/api', phoneNumberRouter); // Use renamed variable
-app.use('/api', uploadRouter); // Use the upload router, mounted at /api
+app.use('/api/phonenumber', phoneNumberRouter); // Use renamed variable
+app.use('/api/upload', uploadRouter); // Use the upload router
 
 // Global error handler
 // This should be the last middleware

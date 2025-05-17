@@ -4,7 +4,7 @@ const UploadFile = require('../middlewares/upload'); // Assuming UploadFile is t
 const router = express.Router();
 
 // POST /api/upload
-router.post('/upload', UploadFile, (req, res) => {
+router.post('/', UploadFile, (req, res) => {
   // Assuming UploadFile middleware handles the file and adds info to req.file or req.files
   if (!req.file && !req.files) {
     return res.status(400).json({ success: false, message: 'No file uploaded.' });
