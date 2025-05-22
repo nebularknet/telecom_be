@@ -1,9 +1,12 @@
 const express = require("express");
 const morgan = require('morgan'); // Import morgan
 const cors = require("cors");
-const userRouter = require("./routes/user_route"); // Renamed from UserRouting
+const authRouter = require("./routes/auth_route");
 const phoneNumberRouter = require('./routes/client/phonenumberRoute'); // Renamed from veriphonenumber
 const uploadRouter = require('./routes/upload_file_route'); // Import the new upload router
+
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
@@ -29,9 +32,12 @@ app.use(
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api/user", userRouter); // Use renamed variable
+app.use("/api", authRouter);
 app.use('/api/phonenumber', phoneNumberRouter); // Use renamed variable
 app.use('/api/upload', uploadRouter); // Use the upload router
+
+// Serve Swagger UI documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Global error handler
 // This should be the last middleware
