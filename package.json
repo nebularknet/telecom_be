@@ -5,7 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon index.js",
-    "test": "echo \"Error: nbo test specified\" && exit 1"
+    "test": "echo \"Error: nbo test specified\" && exit 1",
+    "start":"node index "
   },
   "keywords": [],
   "author": "",
