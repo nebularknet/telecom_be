@@ -1,6 +1,8 @@
 const { OAuth2Client } = require("google-auth-library");
 const crypto = require('crypto'); // For generating state
+const dotenv = require('dotenv')
 
+dotenv.config();
 // Define the handler function directly
 const handleAuthRequest = async (req, res, next) => {
   try {
