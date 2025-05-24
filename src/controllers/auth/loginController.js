@@ -63,6 +63,7 @@ const loginController = async (req, res) => {
       userId: user._id,
       role: user.role,
       email: user.email,
+      name:user.fullname,
     };
     const token = jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
 
@@ -73,6 +74,7 @@ const loginController = async (req, res) => {
       token: token,
       user: {
         id: user._id,
+        name:user.fullname,
         email: user.email,
         role: user.role,
       },

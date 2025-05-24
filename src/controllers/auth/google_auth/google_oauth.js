@@ -90,6 +90,7 @@ const handleGoogleOAuth = async (req, res, next) => {
         // Option 2: Temporary workaround - generate a random, unusable password if schema strictly requires it
         password: crypto.randomBytes(32).toString('hex'), // TEMPORARY: Remove if schema makes password optional
         role: 'admin', // Or 'user', BE CAREFUL with assigning admin role directly
+        type: 'google', // Add type field to identify Google authentication
         isVerified: true, // Google email is considered verified
         // You might want to add other fields from googleUserProfile if your schema supports them
         // e.g., profilePicture: googleUserProfile.picture
