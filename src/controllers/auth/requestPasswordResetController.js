@@ -16,7 +16,12 @@ const requestPasswordResetController = async (req, res) => {
 
     // Even if user not found, send a success response to prevent email enumeration
     if (!user) {
-      return res.status(200).json({ message: "If a user with that email exists, a password reset link has been sent." });
+      return res
+        .status(200)
+        .json({
+          message:
+            "If a user with that email exists, a password reset link has been sent.",
+        });
     }
 
     // Generate a reset token
@@ -29,7 +34,9 @@ const requestPasswordResetController = async (req, res) => {
     await user.save();
 
     // Construct the reset URL (replace with your frontend URL)
-    const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+    const resetUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/reset-password/${resetToken}`;
 
     // TODO: Implement email sending logic using a dedicated email service/utility
     console.log(`Password Reset Token: ${resetToken}`); // Log token for testing if email sending is not set up
@@ -55,11 +62,17 @@ const requestPasswordResetController = async (req, res) => {
     */
 
     // Sending a success response even if email sending is not fully implemented yet
-    res.status(200).json({ message: "If a user with that email exists, a password reset link has been sent." });
-
+    res.status(200).json({
+      message:
+        "If a user with that email exists, a password reset link has been sent.",
+      resetToken,
+      resetUrl,
+    });
   } catch (error) {
     console.error("Request password reset error:", error);
-    res.status(500).json({ message: "Server error during password reset request." });
+    res
+      .status(500)
+      .json({ message: "Server error during password reset request." });
   }
 };
 
