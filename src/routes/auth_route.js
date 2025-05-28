@@ -6,6 +6,7 @@ const logoutController = require('../controllers/auth/logoutController');
 const getMeController = require('../controllers/auth/getMeController');
 const requestPasswordResetController = require('../controllers/auth/requestPasswordResetController');
 const confirmPasswordResetController = require('../controllers/auth/confirmPasswordResetController');
+const resetPasswordController = require('../controllers/auth/resetPasswordController');
 const verifyEmailController = require('../controllers/auth/verifyEmailController');
 const initiateGoogleAuth = require ('../controllers/auth/google_auth/auth_request');
 const handleGoogleOAuthCallback = require ('../controllers/auth/google_auth/google_oauth');
@@ -151,6 +152,33 @@ authrouter.post('/auth/password-reset/request', requestPasswordResetController);
  *         description: Bad request
  */
 authrouter.post('/auth/password-reset/confirm', confirmPasswordResetController);
+
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Reset password
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *       400:
+ *         description: Invalid or expired token
+ *       500:
+ *         description: Internal server error
+ */
+authrouter.post('/auth/reset-password', resetPasswordController);
 
 /**
  * @swagger

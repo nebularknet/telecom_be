@@ -1,7 +1,7 @@
 const UserSchemas = require("../../models/users_model");
 const crypto = require("crypto"); // Node.js built-in module for generating tokens
 // Assuming a sendEmail function exists elsewhere, e.g., in a utils or service file
-// const sendEmail = require("../utils/sendEmail");
+const sendEmail = require("../../utils/sendEmail");
 
 // Request Password Reset Controller
 const requestPasswordResetController = async (req, res) => {
@@ -33,17 +33,12 @@ const requestPasswordResetController = async (req, res) => {
     user.resetPasswordExpires = resetTokenExpires;
     await user.save();
 
-    // Construct the reset URL (replace with your frontend URL)
-    const resetUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/reset-password/${resetToken}`;
+    // Construct the reset URL using the frontend URL from environment variables
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
     // TODO: Implement email sending logic using a dedicated email service/utility
-    console.log(`Password Reset Token: ${resetToken}`); // Log token for testing if email sending is not set up
-    console.log(`Password Reset URL: ${resetUrl}`); // Log URL for testing
-
     // Example of how you might call a sendEmail function (uncomment and implement sendEmail)
-    /*
+
     try {
       await sendEmail({
         email: user.email,
@@ -59,15 +54,6 @@ const requestPasswordResetController = async (req, res) => {
       await user.save();
       return res.status(500).json({ message: "Error sending password reset email." });
     }
-    */
-
-    // Sending a success response even if email sending is not fully implemented yet
-    res.status(200).json({
-      message:
-        "If a user with that email exists, a password reset link has been sent.",
-      resetToken,
-      resetUrl,
-    });
   } catch (error) {
     console.error("Request password reset error:", error);
     res
