@@ -34,7 +34,7 @@ const requestPasswordResetController = async (req, res) => {
     await user.save();
 
     // Construct the reset URL using the frontend URL from environment variables
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/newpassword/${resetToken}`;
 
     // TODO: Implement email sending logic using a dedicated email service/utility
     // Example of how you might call a sendEmail function (uncomment and implement sendEmail)
