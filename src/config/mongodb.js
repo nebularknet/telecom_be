@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
+const env = require('./env'); // Import centralized env
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  console.error('FATAL ERROR: MONGODB_URI environment variable is not set.');
-  process.exit(1); // Exit if URI is not set
-}
+// MONGODB_URI is now accessed via env.MONGODB_URI
+// The check for MONGODB_URI is now done in env.js, so it can be removed from here.
+// if (!env.MONGODB_URI) {
+//   console.error('FATAL ERROR: MONGODB_URI environment variable is not set.');
+//   throw new Error('FATAL ERROR: MONGODB_URI environment variable is not set.');
+// }
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(MONGODB_URI, {
+    await mongoose.connect(env.MONGODB_URI, {
       // Modern Mongoose versions have good defaults,
       // but you can add options here if needed, e.g.:
       // useNewUrlParser: true, // Not needed in Mongoose 6+
@@ -28,11 +29,10 @@ const connectDB = async () => {
       console.warn('MongoDB disconnected.');
       // Optionally, you could try to reconnect here or alert administrators
     });
-
   } catch (err) {
     console.error('Failed to connect to MongoDB:', err.message);
     console.error('Application will now exit.');
-    process.exit(1); // Exit process on initial connection failure
+    throw new Error(`Failed to connect to MongoDB: ${err.message}`); // Exit process on initial connection failure
   }
 };
 

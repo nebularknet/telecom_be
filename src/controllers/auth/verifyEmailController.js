@@ -1,23 +1,27 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require('../../models/users_model');
+const { BadRequestError } = require('../../utils/errors');
 
 // Verify Email Controller
-const verifyEmailController = async (req, res) => {
+const verifyEmailController = async (req, res, next) => {
   try {
-    const { token } = req.params; // Assuming token is passed as a URL parameter
+    // Prefer req.query for tokens in links, but sticking to req.params as per original code
+    const { token } = req.params;
 
     if (!token) {
-      return res.status(400).json({ message: "Verification token is required." });
+      return next(new BadRequestError('Verification token is required.'));
     }
 
     // Find user by verification token and check token expiration (if applicable)
+    // Consider adding a check for token expiration if 'emailVerificationExpires' is implemented
     const user = await UserSchemas.findOne({
       emailVerificationToken: token,
-      // Assuming emailVerificationExpires field exists and is checked
-      // emailVerificationExpires: { $gt: Date.now() },
+      // emailVerificationExpires: { $gt: Date.now() }, // Uncomment if expiration is used
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired verification token." });
+      return next(
+        new BadRequestError('Invalid or expired verification token.'),
+      );
     }
 
     // Update user's email verification status
@@ -26,11 +30,11 @@ const verifyEmailController = async (req, res) => {
     // user.emailVerificationExpires = undefined; // Clear expiration if used
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully." });
-
+    res.status(200).json({ message: 'Email verified successfully.' });
   } catch (error) {
-    console.error("Email verification error:", error);
-    res.status(500).json({ message: "Server error during email verification." });
+    console.error('Email verification error:', error);
+    // Pass error to the global error handler
+    next(error);
   }
 };
 

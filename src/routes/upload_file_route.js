@@ -1,5 +1,6 @@
 const express = require('express');
-const UploadFile = require('../middlewares/upload'); // Assuming UploadFile is the multer middleware setup
+const UploadFile = require('../middlewares/upload'); // This is the combined multer and handler middleware
+const { fileUploadLimiter } = require('../middlewares/rateLimit'); // Import file upload limiter
 
 const router = express.Router();
 
@@ -7,8 +8,11 @@ const router = express.Router();
  * @swagger
  * /upload:
  *   post:
- *     summary: Upload a file
- *     tags: [Upload]
+ *     summary: Upload a JSON file for batch phone number validation processing.
+ *     description: Accepts a JSON file containing an array of phone number records to be validated and stored. The processing is done asynchronously.
+ *     tags: [Upload, Batch]
+ *     security:
+ *       - bearerAuth: [] # Requires authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -20,23 +24,48 @@ const router = express.Router();
  *                 type: string
  *                 format: binary
  *     responses:
- *       200:
- *         description: File uploaded successfully
+ *       202:
+ *         description: File accepted for processing.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string, example: "File uploaded_filename.json uploaded successfully and is being processed." }
  *       400:
- *         description: Bad request
+ *         description: Bad request (e.g., no file, invalid file type, invalid JSON structure)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden (e.g., user does not have permission to upload files - if specific permission is added)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       429:
+ *         description: Too many requests (rate limit exceeded)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 // POST /api/upload
-router.post('/', UploadFile, (req, res) => {
-  // Assuming UploadFile middleware handles the file and adds info to req.file or req.files
-  if (!req.file && !req.files) {
-    return res.status(400).json({ success: false, message: 'No file uploaded.' });
-  }
-  // You might want to send back information about the uploaded file
-  res.status(200).json({
-    success: true,
-    message: 'File uploaded successfully.',
-    file: req.file || req.files
-  });
-});
+// The UploadFile middleware from src/middlewares/upload.js is designed to handle the request fully
+// including sending responses or calling next(error). So, no additional handler is needed here.
+router.post('/', authenticateToken, fileUploadLimiter, UploadFile); // Added authenticateToken
 
 module.exports = router;

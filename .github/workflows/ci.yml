@@ -1,0 +1,85 @@
+name: Node.js CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ] # Or your primary branches
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Specify your Node.js version
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci # Use 'ci' for cleaner installs in CI
+
+      - name: Run ESLint
+        run: npm run lint # Assumes you have a "lint": "eslint ." script in package.json
+
+  test:
+    name: Run Unit & Integration Tests
+    runs-on: ubuntu-latest
+    needs: lint # Optional: Run tests only if linting passes
+
+    services:
+      mongodb:
+        image: mongo:6.0 # Use a specific version of MongoDB, align with your prod/dev
+        ports:
+          - 27017:27017 # Expose MongoDB on the default port
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Specify your Node.js version
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test # Assumes "test" script in package.json runs all tests (unit, integration)
+        env:
+          NODE_ENV: test
+          MONGODB_URI: mongodb://localhost:27017/my_app_ci_test_db # Service container DB
+          TEST_MONGODB_URI: mongodb://localhost:27017/my_app_ci_test_db # If your app specifically uses this for tests
+          JWT_SECRET: ${{ secrets.JWT_SECRET_TEST }} # Use GitHub secrets for sensitive test data
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET_TEST }}
+          COOKIE_SECRET: ${{ secrets.COOKIE_SECRET_TEST }}
+          # Add other necessary environment variables for your tests
+          # e.g., GOOGLE_CLIENTID_TEST, SMTP_HOST_TEST etc.
+          # For non-sensitive test vars, you can define them directly here.
+
+  # Optional: Build step if your app needs a build process (e.g., TypeScript compilation)
+  # build:
+  // ...
+
+  # Optional: Deploy step (example for a simple deployment, real deployments are more complex)
+  # deploy_staging:
+  #   name: Deploy to Staging
+  #   runs-on: ubuntu-latest
+  #   needs: test # Deploy only if tests pass
+  #   if: github.ref == 'refs/heads/develop' # Example: Deploy develop branch to staging
+  #   steps:
+  // ... deployment script using ssh, scp, Docker, cloud provider CLI etc.
+
+  # deploy_production:
+  #   name: Deploy to Production
+  #   runs-on: ubuntu-latest
+  #   needs: test # Or needs: [test, build, staging_approval_step]
+  #   if: github.ref == 'refs/heads/main' # Example: Deploy main branch to production
+  #   steps:
+  // ...

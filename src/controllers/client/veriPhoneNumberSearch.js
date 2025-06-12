@@ -1,11 +1,12 @@
-const PhoneNumberValidation = require("../../models/phonenumberValidation");
-const { validateAndGetCarrier } = require("../../service/libphonenumber");
+const PhoneNumberValidation = require('../../models/phonenumberValidation');
+const { validateAndGetCarrier } = require('../../service/libphonenumber');
+const { BadRequestError } = require('../../utils/errors');
 
-const veriphoneNumberSearch = async (req, res) => {
+const veriphoneNumberSearch = async (req, res, next) => {
   const { phoneNumber } = req.body;
 
   if (!phoneNumber) {
-    return res.status(400).json({ error: "Phone number is required." });
+    return next(new BadRequestError('Phone number is required.'));
   }
 
   try {
@@ -22,24 +23,26 @@ const veriphoneNumberSearch = async (req, res) => {
     // Prepare the response object to match the veriphone.io format exactly.
     // Exclude the internal MCCMNCData field from the response.
     const apiResponse = {
-      "Valid": validationResult.Valid,
-      "Country": validationResult.Country,
-      "Carrier": validationResult.Carrier,
-      "Type": validationResult.Type,
-      "Int_number": validationResult["Int. number"],
-      "Local_number": validationResult["Local number"],
-      "E164_number": validationResult["E164 number"],
-      "Region": validationResult.Region,
-      "Dial_code": validationResult["Dial code"],
-      "MCCMNCData": validationResult.MCCMNCData,
+      Valid: validationResult.Valid,
+      Country: validationResult.Country,
+      Carrier: validationResult.Carrier,
+      Type: validationResult.Type,
+      Int_number: validationResult['Int. number'],
+      Local_number: validationResult['Local number'],
+      E164_number: validationResult['E164 number'],
+      Region: validationResult.Region,
+      Dial_code: validationResult['Dial code'],
+      MCCMNCData: validationResult.MCCMNCData,
     };
 
     // Send the validation result back in the desired format
     res.json(apiResponse);
   } catch (error) {
-    console.error("Validation error:", error);
-    // Send a generic error response
-    res.status(500).json({ error: "An error occurred during validation." });
+    console.error('Validation error:', error);
+    // Pass error to the global error handler
+    // If validateAndGetCarrier throws a custom AppError, it will be handled correctly.
+    // Otherwise, it will be treated as an InternalServerError.
+    next(error);
   }
 };
 module.exports = veriphoneNumberSearch;

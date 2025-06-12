@@ -1,11 +1,12 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require('../../models/users_model');
+const { UnauthorizedError } = require('../../utils/errors');
 
 // Logout Controller
-const logoutController = async (req, res) => {
+const logoutController = async (req, res, next) => {
   try {
     // Assuming authentication middleware has attached user information to req.user
     if (!req.user || !req.user.userId) {
-      return res.status(401).json({ message: "User not authenticated." });
+      return next(new UnauthorizedError('User not authenticated.'));
     }
 
     const userId = req.user.userId;
@@ -18,14 +19,18 @@ const logoutController = async (req, res) => {
       await user.save();
     }
 
-    // Clear the JWT cookie on the client side (if using cookies)
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+    // Clear the JWT cookie on the client side
+    res.clearCookie('jid', {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
 
-    res.status(200).json({ message: "Logout successful." });
-
+    res.status(200).json({ message: 'Logout successful.' });
   } catch (error) {
-    console.error("Logout error:", error);
-    res.status(500).json({ message: "Server error during logout." });
+    console.error('Logout error:', error);
+    // Pass error to the global error handler
+    next(error);
   }
 };
 
