@@ -1,12 +1,13 @@
-const express = require('express')
-const PhoneNumberSearch = require('../../controllers/client/veriPhoneNumberSearch')
+const express = require('express');
+const PhoneNumberSearch = require('../../controllers/client/veriPhoneNumberSearch');
+const {UnAuthUser} = require('../../middlewares/unAuthUser');
 const authrouter = express.Router();
 
 
 
 /**
  * @swagger
- * /client/verify:
+ * /api/phonenumber/verify:
  *   post:
  *     summary: Verify a phone number
  *     tags: [Client]
@@ -25,6 +26,6 @@ const authrouter = express.Router();
  *       400:
  *         description: Bad request
  */
-authrouter.post('/verify',PhoneNumberSearch)
+authrouter.post('/verify',UnAuthUser,PhoneNumberSearch)
 
 module.exports=authrouter

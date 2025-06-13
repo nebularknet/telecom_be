@@ -10,7 +10,7 @@ const resetPasswordController = require('../controllers/auth/resetPasswordContro
 const verifyEmailController = require('../controllers/auth/verifyEmailController');
 const initiateGoogleAuth = require ('../controllers/auth/google_auth/auth_request');
 const handleGoogleOAuthCallback = require ('../controllers/auth/google_auth/google_oauth');
-const { authenticateToken } = require('../middlewares/Auth'); // Import authenticateToken middleware
+const { authenticateToken } = require('../middlewares/auth'); // Import authenticateToken middleware
 const authrouter = express.Router();
 
 /**
