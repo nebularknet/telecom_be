@@ -1,6 +1,7 @@
 const express = require('express');
 const PhoneNumberSearch = require('../../controllers/client/veriPhoneNumberSearch');
 const {UnAuthUser} = require('../../middlewares/unAuthUser');
+const {checkRole} = require('../../middlewares/auth');
 const authrouter = express.Router();
 
 
@@ -26,6 +27,7 @@ const authrouter = express.Router();
  *       400:
  *         description: Bad request
  */
-authrouter.post('/verify',UnAuthUser,PhoneNumberSearch)
+// authrouter.post('/verify',checkRole('anonymous'),PhoneNumberSearch)
+authrouter.post('/verify',checkRole('anonymous'),UnAuthUser,PhoneNumberSearch)
 
 module.exports=authrouter

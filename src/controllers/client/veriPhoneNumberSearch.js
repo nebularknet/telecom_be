@@ -2,6 +2,15 @@ const PhoneNumberValidation = require("../../models/phonenumberValidation");
 const { validateAndGetCarrier } = require("../../service/libphonenumber");
 
 const veriphoneNumberSearch = async (req, res) => {
+  const {role} = req.body;  // assuming the role is added to `req.user` after authentication
+
+  // Ensure user has 'anonymous' role
+  if (role !== 'anonymous') {
+    return res.status(403).json({
+      success: false,
+      message: 'Forbidden: You do not have permission to access this resource.'
+    });
+  }
   const { phoneNumber } = req.body;
 
   if (!phoneNumber) {

@@ -3,7 +3,7 @@ const rateLimit = require('express-rate-limit');
 // Create rate limiter middleware
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 2, // limit each IP to 2 requests per windowMs
+    max: 1, // limit each IP to 2 requests per windowMs
     message: 'You have reached your request limit. Please try again later.',
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers

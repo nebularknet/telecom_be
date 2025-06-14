@@ -49,8 +49,22 @@ const isAdmin = (req, res, next) => {
     next();
 };
 
+const checkRole = (allowedRoles) => {
+    return (req, res, next) => {
+        const {role} = req.body;  // assuming the user is attached to the request (e.g., via JWT or session)
+        
+        if (!role || !allowedRoles.includes(role)) {
+            return res.status(403).json({
+                success: false,
+                message: 'Forbidden: You do not have permission to access this resource.'
+            });
+        }
 
+        next();  // If the role is allowed, proceed to the next middleware or route
+    };
+};
 module.exports = {
     authenticateToken,
-    isAdmin
+    isAdmin,
+    checkRole
 };

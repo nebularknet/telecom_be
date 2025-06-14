@@ -22,10 +22,9 @@ const UserSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['client', 'admin'], // Example roles
-        default: 'client',
+        enum: ['anonymous', 'free_user', 'trial_user', 'paid_user', 'enterprise_user'], // Updated roles
+        default: 'anonymous', // Default role
     },
-    // created_at and updated_at will be handled by the timestamps option below
 },
     {
         timestamps:
