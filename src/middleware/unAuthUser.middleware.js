@@ -29,7 +29,7 @@ const UnAuthUser = async (req, res, next) => {
             }
             next();
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: 'Internal server error while processing request'

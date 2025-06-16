@@ -1,12 +1,14 @@
 {
-  "name": "backend",
+  "name": "telecom_be",
   "version": "1.0.0",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon index.js",
     "test": "echo \"Error: nbo test specified\" && exit 1",
-    "start": "node index "
+    "start": "node index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [],
   "author": "",
@@ -32,8 +34,10 @@
   },
   "devDependencies": {
     "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^7.2.1"
+    "eslint-plugin-promise": "^7.2.1",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3"
   }
 }

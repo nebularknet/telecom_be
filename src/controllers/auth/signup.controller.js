@@ -1,4 +1,4 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
 const bcryptjs = require("bcryptjs");
 
 /**
@@ -84,7 +84,7 @@ const signupController = async (req, res) => {
   // Check if req.body exists before attempting to destructure
   // NOTE: Ensure express.json() middleware is applied *before* this route in your app setup.
   if (!req.body) {
-    console.error(
+    process.stderr.write(
       "Registration error: Request body is missing or empty."
     );
     // Send a 400 Bad Request response indicating the issue
@@ -98,7 +98,7 @@ const signupController = async (req, res) => {
   // Basic validation - Ensure required fields are provided
   if (!fullname || !email || !password || !role) {
     // Log the received body for debugging partial data issues
-    console.warn("Registration validation failed: Missing fields.", {
+    process.stderr.write("Registration validation failed: Missing fields.", {
       fullname: !!fullname,
       email: !!email,
       password: !!password,
@@ -114,7 +114,7 @@ const signupController = async (req, res) => {
     const existingUser = await UserSchemas.findOne({ email });
     if (existingUser) {
       // If user exists, return a conflict error
-      console.warn(
+      process.stderr.write(
         `Registration conflict: Email ${email} already exists.`
       );
       return res
@@ -138,14 +138,14 @@ const signupController = async (req, res) => {
     await newUser.save();
 
     // Respond with success message and the new user's ID (excluding sensitive info)
-    console.info(
+    process.stderr.write(
       `${role} registered successfully: ${newUser.email} (ID: ${newUser._id})`
     );
     res
       .status(201)
       .json({ message: `${role} registered successfully.`, userId: newUser._id });
   } catch (error) {
-    console.error("Registration error:", error);
+    process.stderr.write("Registration error:", error);
     // Handle Mongoose validation errors specifically
     if (error.name === "ValidationError") {
       // Extract validation error messages
@@ -156,7 +156,7 @@ const signupController = async (req, res) => {
     }
     // Handle potential duplicate key errors from MongoDB (though covered by findOne check)
     if (error.code === 11000) {
-      console.warn(`Registration duplicate key error: ${error.message}`);
+      process.stderr.write(`Registration duplicate key error: ${error.message}`);
       return res
         .status(409)
         .json({

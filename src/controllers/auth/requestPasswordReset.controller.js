@@ -1,4 +1,4 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
 const crypto = require("crypto"); // Node.js built-in module for generating tokens
 // Assuming a sendEmail function exists elsewhere, e.g., in a utils or service file
 const sendEmail = require("../../utils/sendEmail");
@@ -47,7 +47,7 @@ const requestPasswordResetController = async (req, res) => {
       });
       res.status(200).json({ message: "Password reset email sent." });
     } catch (emailError) {
-      console.error("Error sending password reset email:", emailError);
+      process.stderr.write("Error sending password reset email:", emailError);
       // If email sending fails, you might want to clear the token from the user record
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
@@ -55,7 +55,7 @@ const requestPasswordResetController = async (req, res) => {
       return res.status(500).json({ message: "Error sending password reset email." });
     }
   } catch (error) {
-    console.error("Request password reset error:", error);
+    process.stderr.write("Request password reset error:", error);
     res
       .status(500)
       .json({ message: "Server error during password reset request." });

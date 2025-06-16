@@ -1,4 +1,4 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -7,7 +7,7 @@ const loginController = async (req, res) => {
   try {
     // Ensure req.body exists
     if (!req.body) {
-      console.error("Login error: Request body is missing or empty.");
+      process.stderr.write("Login error: Request body is missing or empty.");
       return res
         .status(400)
         .json({ message: "Request body is missing or empty." });
@@ -17,7 +17,7 @@ const loginController = async (req, res) => {
 
     // Validate input
     if (!email || !password || !role) {
-      console.warn("Login validation failed: Missing email, password, or role.");
+      process.stderr.write("Login validation failed: Missing email, password, or role.");
       return res
         .status(400)
         .json({ message: "Email, password, and role are required." });
@@ -28,13 +28,13 @@ const loginController = async (req, res) => {
 
     // Check if user exists
     if (!user) {
-      console.warn(`Login failed: User not found for email ${email}`);
+      process.stderr.write(`Login failed: User not found for email ${email}`);
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
     // Check if user has the correct role
     if (user.role !== role) {
-      console.warn(`${role} login failed: User not ${role} for email ${email}`);
+      process.stderr.write(`${role} login failed: User not ${role} for email ${email}`);
       return res
         .status(401)
         .json({ message: "Invalid credentials or insufficient permissions." });
@@ -43,7 +43,7 @@ const loginController = async (req, res) => {
     // Compare passwords using the imported bcryptjs library
     const isMatch = await bcryptjs.compare(password, user.password);
     if (!isMatch) {
-      console.warn(`Login failed: Incorrect password for email ${email}`);
+      process.stderr.write(`Login failed: Incorrect password for email ${email}`);
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
@@ -52,7 +52,7 @@ const loginController = async (req, res) => {
     const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "1h";
 
     if (!jwtSecret) {
-      console.error(
+      process.stderr.write(
         "JWT_SECRET environment variable is not set. Cannot generate token."
       );
       return res.status(500).json({ message: "Server configuration error." });
@@ -68,7 +68,7 @@ const loginController = async (req, res) => {
     const token = jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
 
     // Send success response with token
-    console.info(`${role} logged in successfully: ${user.email}`);
+    process.stderr.write(`${role} logged in successfully: ${user.email}`);
     return res.status(200).json({
       message: `${role} login successful.`,
       token: token,
@@ -80,7 +80,7 @@ const loginController = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(`${role} login error:`, error);
+    process.stderr.write("Login error:", error);
     return res.status(500).json({
       message: "Server error during login.",
       error: error.message,

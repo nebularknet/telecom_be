@@ -1,4 +1,4 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
 const jwt = require("jsonwebtoken");
 
 // Refresh Token Controller
@@ -44,7 +44,7 @@ const refreshTokenController = async (req, res) => {
     );
 
   } catch (error) {
-    console.error("Refresh token error:", error);
+    process.stderr.write("Refresh token error:", error);
     res.status(500).json({ message: "Server error during token refresh." });
   }
 };

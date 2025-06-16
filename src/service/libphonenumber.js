@@ -76,7 +76,7 @@ async function validateAndGetCarrier(phoneNumber) {
     }
 
   } catch (error) {
-    console.error('Error parsing or validating phone number:', error);
+    process.stderr.write('Error parsing or validating phone number:', error);
     // If parsing fails completely, the number is definitely not valid
     validationResult.Valid = false;
   }

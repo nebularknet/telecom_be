@@ -1,4 +1,4 @@
-const PhoneNumberValidation = require("../../models/phonenumberValidation");
+const PhoneNumberValidation = require("../../models/verfication.model");
 const { validateAndGetCarrier } = require("../../service/libphonenumber");
 
 const veriphoneNumberSearch = async (req, res) => {
@@ -46,7 +46,7 @@ const veriphoneNumberSearch = async (req, res) => {
     // Send the validation result back in the desired format
     res.json(apiResponse);
   } catch (error) {
-    console.error("Validation error:", error);
+    process.stderr.write("Validation error:", error);
     // Send a generic error response
     res.status(500).json({ error: "An error occurred during validation." });
   }

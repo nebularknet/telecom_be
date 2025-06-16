@@ -1,4 +1,4 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
 
 // Verify Email Controller
 const verifyEmailController = async (req, res) => {
@@ -29,7 +29,7 @@ const verifyEmailController = async (req, res) => {
     res.status(200).json({ message: "Email verified successfully." });
 
   } catch (error) {
-    console.error("Email verification error:", error);
+    process.stderr.write("Email verification error:", error);
     res.status(500).json({ message: "Server error during email verification." });
   }
 };
