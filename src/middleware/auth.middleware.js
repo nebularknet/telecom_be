@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
-const { Role, READ_PERMISSIONS, WRITE_PERMISSIONS, MANAGEMENT_PERMISSIONS } = require('../models/role.model');
+const Role = require('../models/role.model');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -29,26 +29,25 @@ const auth = async (req, res, next) => {
 };
 
 // Role checking middleware
-const checkRole = (requiredRole) => {
+const checkRole = (requiredRole,checKpermission) => {
     return async (req, res, next) => {
         try {
             const role = await Role.findOne({ name:requiredRole});
+            console.log('role ====>',role)
             
             if (!role) {
                 return res.status(400).json({ message: 'Invalid role specified' });
             }
 
             // For anonymous role, allow access without checking user
-            if (requiredRole === 'ANONYMOUS') {
-                return next();
+            if (role.name === 'ANONYMOUS') {
+                // Check if role has required permissions
+                if (role.permissions.includes('read:public') === checKpermission) {
+                    return next();
+                }
             }
-
-            // For other roles, check if user exists and has the required role
-            if (!req.user) {
-                return res.status(401).json({ message: 'Authentication required' });
-            }
-
-            if (req.user.role.name !== requiredRole) {
+            
+            if (role.name !== requiredRole) {
                 return res.status(403).json({ 
                     message: 'You do not have the required role for this action' 
                 });

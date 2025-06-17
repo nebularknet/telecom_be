@@ -259,11 +259,7 @@ roleSchema.statics.initializeRoles = async function() {
     }
 };
 
+// Export the model
 const Role = mongoose.model('Role', roleSchema);
 
-module.exports = {
-    Role,
-    READ_PERMISSIONS,
-    WRITE_PERMISSIONS,
-    MANAGEMENT_PERMISSIONS
-}; 
+module.exports = Role; 

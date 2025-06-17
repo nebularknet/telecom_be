@@ -42,7 +42,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Global error handler
 // This should be the last middleware
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   // eslint-disable-next-line no-console
   console.error(err.stack); // Log the error stack for debugging
 

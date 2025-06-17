@@ -38,7 +38,7 @@ const authrouter = express.Router();
  *       400:
  *         description: Bad request
  */
-authrouter.post('/auth/signup', signupController);
+authrouter.post('/signup', signupController);
 
 /**
  * @swagger

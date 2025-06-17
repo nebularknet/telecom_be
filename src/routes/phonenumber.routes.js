@@ -1,8 +1,7 @@
 const express = require('express');
 const PhoneNumberSearch = require('../controllers/client/veriphonenumbersearch.controller');
 const {UnAuthUser} = require('../middleware/unAuthUser.middleware');
-const {checkRole,checkReadPermission} = require('../middleware/auth.middleware');
-const {READ_PERMISSIONS} = require('../models/role.model')
+const {checkRole} = require('../middleware/auth.middleware');
 const phoneNumberRouter = express.Router();
 
 /**
@@ -27,6 +26,10 @@ const phoneNumberRouter = express.Router();
  *         description: Bad request
  */
 // authrouter.post('/verify',checkRole('anonymous'),PhoneNumberSearch)
-phoneNumberRouter.post('/verify', UnAuthUser, checkRole('ANONYMOUS'), checkReadPermission(READ_PERMISSIONS.PUBLIC), PhoneNumberSearch)
+phoneNumberRouter.post('/verify', 
+    UnAuthUser, 
+    checkRole('ANONYMOUS','read:public'),
+    PhoneNumberSearch
+);
 
 module.exports = phoneNumberRouter

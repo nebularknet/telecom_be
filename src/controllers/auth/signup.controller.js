@@ -1,4 +1,5 @@
 const UserSchemas = require("../../models/user.model");
+const Role = require("../../models/role.model");
 const bcryptjs = require("bcryptjs");
 
 /**
@@ -122,16 +123,24 @@ const signupController = async (req, res) => {
         .json({ message: "User with this email already exists." });
     }
 
+    // Find the role by name
+    const userRole = await Role.findOne({ name: role});
+    if (!userRole) {
+      return res
+        .status(400)
+        .json({ message: "Invalid role specified." });
+    }
+
     // Generate salt and hash the password
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 
-    // Create a new user instance with hashed password and provided role
+    // Create a new user instance with hashed password and role reference
     const newUser = new UserSchemas({
       fullname,
       email,
       password: hashedPassword,
-      role
+      role: userRole._id
     });
 
     // Save the new user to the database
@@ -139,11 +148,11 @@ const signupController = async (req, res) => {
 
     // Respond with success message and the new user's ID (excluding sensitive info)
     process.stderr.write(
-      `${role} registered successfully: ${newUser.email} (ID: ${newUser._id})`
+      `registered successfully: ${newUser.email} (ID: ${newUser._id})`
     );
     res
       .status(201)
-      .json({ message: `${role} registered successfully.`, userId: newUser._id });
+      .json({ message: `registered successfully.`, userId: newUser._id });
   } catch (error) {
     process.stderr.write("Registration error:", error);
     // Handle Mongoose validation errors specifically
