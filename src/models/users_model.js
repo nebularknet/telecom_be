@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Role } = require('../models/role_model');
 
 const UserSchema = new mongoose.Schema({
     fullname: {
@@ -34,3 +35,39 @@ const UserSchema = new mongoose.Schema({
         }
     }); // Automatically manage created_at and updated_at
 module.exports = mongoose.model("user", UserSchema);
+
+const createOrganization = async (req, res) => {
+    try {
+        const { name, description } = req.body;
+        
+        // Create organization
+        const organization = new Organization({
+            name,
+            description,
+            owner: req.user._id,
+            slug: name.toLowerCase().replace(/\s+/g, '-')
+        });
+
+        // Add owner as first member with owner role
+        const ownerRole = await Role.findOne({ name: 'owner' });
+        organization.members.push({
+            user: req.user._id,
+            role: ownerRole._id,
+            status: 'active'
+        });
+
+        await organization.save();
+
+        // Update user's organizations array
+        req.user.organizations.push({
+            organization: organization._id,
+            role: ownerRole._id,
+            isDefault: true
+        });
+        await req.user.save();
+
+        res.status(201).json({ organization });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating organization' });
+    }
+};
