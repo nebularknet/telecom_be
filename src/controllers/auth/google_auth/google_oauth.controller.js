@@ -1,6 +1,6 @@
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken"); // For generating app tokens
-const User = require("../../../models/users_model"); // Adjust path if necessary
+const User = require("../../../models/user.model"); // Adjust path if necessary
 const crypto = require('crypto'); // For generating placeholder password if needed
 
 async function getUserData(access_token) {
@@ -10,23 +10,22 @@ async function getUserData(access_token) {
     );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: response.statusText }));
-      console.error("Failed to fetch user data from Google:", response.status, errorData);
+      process.stderr.write("Failed to fetch user data from Google:", response.status, errorData);
       throw new Error(`Google API Error: ${response.status} ${errorData.message || ''}`);
     }
     const data = await response.json();
-    console.log("Fetched Google user data:", data);
+    process.stderr.write("Fetched Google user data:", data);
     return data;
   } catch (error) {
-    console.error("Error in getUserData:", error);
+    process.stderr.write("Error in getUserData:", error);
     throw error; // Re-throw to be caught by the main handler
   }
 }
 
 // This function will handle the POST request from /api/user/oauth
-const handleGoogleOAuth = async (req, res, next) => {
+const handleGoogleOAuth = async (req, res) => {
   // The code might be in req.body for a POST request, or req.query if it's somehow still passed as a query param
   const code =  req?.body?.code || req?.query?.code
-  const receivedState = req?.body?.state || req?.query?.state; // Get state from request
 
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -34,7 +33,7 @@ const handleGoogleOAuth = async (req, res, next) => {
   // This requires session middleware (e.g., express-session) to be set up.
   // const sessionState = req.session ? req.session.googleOauthState : null;
   // if (!receivedState || !sessionState || receivedState !== sessionState) {
-  //   console.error("Invalid OAuth state (CSRF protection). Received:", receivedState, "Expected:", sessionState);
+  //   process.stderr.write("Invalid OAuth state (CSRF protection). Received:", receivedState, "Expected:", sessionState);
   //   // Clear the potentially compromised session state if it exists
   //   // if (req.session) req.session.googleOauthState = null;
   //   return res.redirect(303, `${frontendUrl}/?error=invalid_state`);
@@ -43,7 +42,7 @@ const handleGoogleOAuth = async (req, res, next) => {
   // if (req.session) req.session.googleOauthState = null;
 
   if (!code) {
-    console.log("Authorization code not found in request.");
+    process.stderr.write("Authorization code not found in request.");
     return res.redirect(303, `${frontendUrl}/?error=nocode`);
   }
 
@@ -53,7 +52,7 @@ const handleGoogleOAuth = async (req, res, next) => {
     const googleClientSecret = process.env.GOOGLE_SECRETID;
 
     if (!redirectURL || !googleClientId || !googleClientSecret) {
-      console.error("Google OAuth environment variables for callback are not fully set.");
+      process.stderr.write("Google OAuth environment variables for callback are not fully set.");
       return res.status(500).json({ message: "Server configuration error for Google OAuth callback." });
     }
 
@@ -61,12 +60,12 @@ const handleGoogleOAuth = async (req, res, next) => {
 
     const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
-    console.info("Google OAuth tokens acquired.");
+    process.stderr.write("Google OAuth tokens acquired.");
 
     const googleUserProfile = await getUserData(tokens.access_token);
 
     if (!googleUserProfile || !googleUserProfile.email) {
-      console.error("Failed to fetch Google user profile or email is missing.");
+      process.stderr.write("Failed to fetch Google user profile or email is missing.");
       return res.redirect(303, `${frontendUrl}/?error=profile_fetch_failed`);
     }
 
@@ -79,7 +78,7 @@ const handleGoogleOAuth = async (req, res, next) => {
       // or only allow existing admins to link their Google account.
       // This example assumes new users are created with 'user' role.
       // Adjust role assignment based on your application's logic for admin Google sign-up/sign-in.
-      console.log(`User not found for email ${googleUserProfile.email}. Creating new user.`);
+      process.stderr.write(`User not found for email ${googleUserProfile.email}. Creating new user.`);
       user = new User({
         email: googleUserProfile.email,
         googleId: googleUserProfile.sub, // 'sub' is the standard Google User ID
@@ -96,15 +95,15 @@ const handleGoogleOAuth = async (req, res, next) => {
         // e.g., profilePicture: googleUserProfile.picture
       });
       await user.save();
-      console.log(`New user created with ID: ${user._id}`);
+      process.stderr.write(`New user created with ID: ${user._id}`);
     } else {
       // User exists, update Google ID if not present (linking account)
       if (!user.googleId) {
         user.googleId = googleUserProfile.sub;
         await user.save();
-        console.log(`Linked Google ID for existing user: ${user.email}`);
+        process.stderr.write(`Linked Google ID for existing user: ${user.email}`);
       }
-      console.log(`User found: ${user.email}`);
+      process.stderr.write(`User found: ${user.email}`);
     }
 
     // Generate your application's JWT
@@ -117,7 +116,7 @@ const handleGoogleOAuth = async (req, res, next) => {
     const jwtExpiresIn = process.env.JWT_EXPIRES_IN || '1h';
 
     if (!jwtSecret) {
-      console.error("JWT_SECRET is not set. Cannot sign token.");
+      process.stderr.write("JWT_SECRET is not set. Cannot sign token.");
       return res.redirect(303, `${frontendUrl}/?error=server_config_error`);
     }
 
@@ -125,11 +124,11 @@ const handleGoogleOAuth = async (req, res, next) => {
 
     // Redirect to frontend with the token (or handle via session/cookies)
     // Sending token in query param is common but consider security implications (e.g., browser history)
-    console.info(`Successfully authenticated user ${user.email} via Google. Redirecting with token.`);
+    process.stderr.write(`Successfully authenticated user ${user.email} via Google. Redirecting with token.`);
     res.redirect(303, `${frontendUrl}/auth/google/success?token=${appToken}`);
 
   } catch (err) {
-    console.error("Error during Google OAuth callback flow:", err.message, err.stack);
+    process.stderr.write("Error during Google OAuth callback flow:", err.message, err.stack);
     res.redirect(303, `${frontendUrl}/?error=oauth_processing_failed`);
   }
 };

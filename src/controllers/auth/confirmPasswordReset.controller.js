@@ -1,6 +1,5 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
 const bcryptjs = require("bcryptjs");
-const jwt = require("jsonwebtoken"); // Assuming JWT is used for tokens, adjust if not
 
 // Confirm Password Reset Controller
 const confirmPasswordResetController = async (req, res) => {
@@ -36,7 +35,7 @@ const confirmPasswordResetController = async (req, res) => {
     res.status(200).json({ message: "Password reset successfully." });
 
   } catch (error) {
-    console.error("Confirm password reset error:", error);
+    process.stderr.write("Confirm password reset error:", error);
     res.status(500).json({ message: "Server error during password reset confirmation." });
   }
 };

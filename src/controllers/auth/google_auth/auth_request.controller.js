@@ -4,7 +4,7 @@ const dotenv = require('dotenv')
 
 dotenv.config();
 // Define the handler function directly
-const handleAuthRequest = async (req, res, next) => {
+const handleAuthRequest = async (req, res) => {
   try {
     // CORS headers should be handled by global CORS middleware in app.js
     // res.header("Access-Control-Allow-Origin", "http://localhost:5173"); 
@@ -16,7 +16,7 @@ const handleAuthRequest = async (req, res, next) => {
     const googleClientSecret = process.env.GOOGLE_SECRETID;
 
     if (!redirectURL || !googleClientId || !googleClientSecret) {
-      console.error("Google OAuth environment variables are not fully set.");
+      process.stderr.write("Google OAuth environment variables are not fully set.");
       return res.status(500).json({ message: "Server configuration error for Google OAuth." });
     }
 
@@ -51,7 +51,7 @@ const handleAuthRequest = async (req, res, next) => {
     res.json({ url: authorizeUrl });
 
   } catch (error) {
-    console.error("Error generating Google OAuth URL:", error);
+    process.stderr.write("Error generating Google OAuth URL:", error);
     res.status(500).json({ message: "Error initiating Google authentication." });
   }
 };

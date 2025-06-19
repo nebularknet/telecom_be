@@ -1,5 +1,5 @@
-const User = require('../../models/users_model');
-const Verification = require('../../models/verfication_model');
+const User = require('../../models/user.model');
+const Verification = require('../../models/phonenumber.model');
 const bcrypt = require('bcryptjs');
 
 const resetPasswordController = async (req, res) => {
@@ -41,7 +41,7 @@ const resetPasswordController = async (req, res) => {
     res.status(200).json({ message: 'Password reset successful.' });
 
   } catch (error) {
-    console.error('Error resetting password:', error);
+    process.stderr.write('Error resetting password:', error);
     res.status(500).json({ message: 'An error occurred while resetting the password.' });
   }
 };

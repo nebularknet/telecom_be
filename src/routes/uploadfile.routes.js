@@ -1,5 +1,5 @@
 const express = require('express');
-const UploadFile = require('../middlewares/upload'); // Assuming UploadFile is the multer middleware setup
+const UploadFile = require('../middleware/upload.middleware.'); // Assuming UploadFile is the multer middleware setup
 
 const router = express.Router();
 
