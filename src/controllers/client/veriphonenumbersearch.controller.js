@@ -1,4 +1,4 @@
-const PhoneNumberValidation = require("../../models/verfication.model");
+const PhoneNumberValidation = require("../../models/phonenumber.model");
 const { validateAndGetCarrier } = require("../../service/libphonenumber");
 
 const veriphoneNumberSearch = async (req, res) => {

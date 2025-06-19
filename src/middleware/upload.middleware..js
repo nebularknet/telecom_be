@@ -1,6 +1,6 @@
 const fs = require('fs');
 const multer = require('multer');
-const VerificationPhone = require('../models/verfication.model');
+const VerificationPhone = require('../models/phonenumber.model');
 
 // Configure multer to accept only JSON files
 const upload = multer({ 

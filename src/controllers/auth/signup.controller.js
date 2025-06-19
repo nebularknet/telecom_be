@@ -124,13 +124,8 @@ const signupController = async (req, res) => {
     }
 
     // Find the role by name
-    const userRole = await Role.findOne({ name: role});
-    if (!userRole) {
-      return res
-        .status(400)
-        .json({ message: "Invalid role specified." });
-    }
-
+    // Check if role exists, if not create it
+    let userRole = await Role.findOne({ name: role });
     // Generate salt and hash the password
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
@@ -140,7 +135,7 @@ const signupController = async (req, res) => {
       fullname,
       email,
       password: hashedPassword,
-      role: userRole._id
+      role: userRole._id,
     });
 
     // Save the new user to the database

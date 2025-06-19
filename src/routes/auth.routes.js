@@ -63,7 +63,7 @@ authrouter.post('/signup', signupController);
  *       401:
  *         description: Unauthorized
  */
-authrouter.post('/auth/login', loginController);
+authrouter.post('/login', loginController);
 
 /**
  * @swagger
@@ -77,7 +77,7 @@ authrouter.post('/auth/login', loginController);
  *       401:
  *         description: Unauthorized
  */
-authrouter.post('/auth/refresh', refreshTokenController);
+authrouter.post('/refresh', refreshTokenController);
 
 /**
  * @swagger
@@ -89,7 +89,7 @@ authrouter.post('/auth/refresh', refreshTokenController);
  *       200:
  *         description: User logged out successfully
  */
-authrouter.post('/auth/logout', logoutController);
+authrouter.post('/logout', logoutController);
 
 /**
  * @swagger
@@ -103,7 +103,7 @@ authrouter.post('/auth/logout', logoutController);
  *       401:
  *         description: Unauthorized
  */
-authrouter.get('/auth/me', auth, getMeController); // Apply authenticateToken middleware
+authrouter.get('/me', auth, getMeController); // Apply authenticateToken middleware
 
 /**
  * @swagger
@@ -126,7 +126,7 @@ authrouter.get('/auth/me', auth, getMeController); // Apply authenticateToken mi
  *       400:
  *         description: Bad request
  */
-authrouter.post('/auth/password-reset/request', requestPasswordResetController);
+authrouter.post('/password-reset/request', requestPasswordResetController);
 
 /**
  * @swagger
@@ -151,7 +151,7 @@ authrouter.post('/auth/password-reset/request', requestPasswordResetController);
  *       400:
  *         description: Bad request
  */
-authrouter.post('/auth/password-reset/confirm', confirmPasswordResetController);
+authrouter.post('/password-reset/confirm', confirmPasswordResetController);
 
 /**
  * @swagger
@@ -178,7 +178,7 @@ authrouter.post('/auth/password-reset/confirm', confirmPasswordResetController);
  *       500:
  *         description: Internal server error
  */
-authrouter.post('/auth/reset-password', resetPasswordController);
+authrouter.post('/reset-password', resetPasswordController);
 
 /**
  * @swagger
@@ -199,7 +199,7 @@ authrouter.post('/auth/reset-password', resetPasswordController);
  *       400:
  *         description: Bad request
  */
-authrouter.get('/auth/email-verify', verifyEmailController);
+authrouter.get('/email-verify', verifyEmailController);
 
 /**
  * @swagger
@@ -211,7 +211,7 @@ authrouter.get('/auth/email-verify', verifyEmailController);
  *       200:
  *         description: Google auth request initiated
  */
-authrouter.post('/auth/google/request', handleAuthRequest),
+authrouter.post('/google/request', handleAuthRequest),
 
 /**
  * @swagger
@@ -225,6 +225,6 @@ authrouter.post('/auth/google/request', handleAuthRequest),
  *       400:
  *         description: Bad request
  */
-authrouter.post('/auth/google/callback', handleGoogleOAuthCallback),
+authrouter.post('/google/callback', handleGoogleOAuthCallback),
 
 module.exports = authrouter

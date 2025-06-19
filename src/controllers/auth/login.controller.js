@@ -33,12 +33,12 @@ const loginController = async (req, res) => {
     }
 
     // Check if user has the correct role
-    if (user.role !== role) {
-      process.stderr.write(`${role} login failed: User not ${role} for email ${email}`);
-      return res
-        .status(401)
-        .json({ message: "Invalid credentials or insufficient permissions." });
-    }
+    // if (user.role !== role) {
+    //   process.stderr.write(`${role} login failed: User not ${role} for email ${email}`);
+    //   return res
+    //     .status(401)
+    //     .json({ message: "Invalid credentials or insufficient permissions." });
+    // }
 
     // Compare passwords using the imported bcryptjs library
     const isMatch = await bcryptjs.compare(password, user.password);
@@ -49,7 +49,7 @@ const loginController = async (req, res) => {
 
     // Check if JWT_SECRET is available
     const jwtSecret = process.env.JWT_SECRET;
-    const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "1h";
+    const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "1d";
 
     if (!jwtSecret) {
       process.stderr.write(

@@ -1,5 +1,5 @@
 const User = require('../../models/user.model');
-const Verification = require('../../models/verfication.model');
+const Verification = require('../../models/phonenumber.model');
 const bcrypt = require('bcryptjs');
 
 const resetPasswordController = async (req, res) => {
