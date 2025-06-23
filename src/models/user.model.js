@@ -25,6 +25,14 @@ const UserSchema = new mongoose.Schema({
         ref: 'Role',
         required: true
     },
+    trialStart: {
+        type: Date,
+        default: null,
+      },
+      trialEnd: {
+        type: Date,
+        default: null,
+      },
 },
     {
         timestamps:

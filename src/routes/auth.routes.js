@@ -10,6 +10,8 @@ const resetPasswordController = require('../controllers/auth/resetPassword.contr
 const verifyEmailController = require('../controllers/auth/verifyEmail.controller');
 const handleAuthRequest = require('../controllers/auth/google_auth/auth_request.controller');
 const handleGoogleOAuthCallback = require('../controllers/auth/google_auth/google_oauth.controller');
+const {getCurrentUserRole} = require('../controllers/auth/currentUserRole.controller')
+const upgradeUserRoleController = require('../controllers/auth/upgradeUserRole.controller');
 const { auth } = require('../middleware/auth.middleware'); // Import authenticateToken middleware
 const authrouter = express.Router();
 
@@ -226,5 +228,92 @@ authrouter.post('/google/request', handleAuthRequest),
  *         description: Bad request
  */
 authrouter.post('/google/callback', handleGoogleOAuthCallback),
+
+/**
+ * @swagger
+ * /api/auth/user-role:
+ *   get:
+ *     summary: Get current user's role
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Role and permissions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 role:
+ *                   type: string
+ *                   example: PAID_USER
+ *                 permissions:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: [ "read:own", "write:own", "read:premium" ]
+ *                 description:
+ *                   type: string
+ *                   example: Subscribed to a plan with higher limits
+ *       401:
+ *         description: Unauthorized
+ */
+
+authrouter.get('/user-role', auth, getCurrentUserRole);
+
+/**
+ * @swagger
+ * /api/roles/user-role/upgrade:
+ *   post:
+ *     summary: Upgrade current user's role
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - newRole
+ *             properties:
+ *               newRole:
+ *                 type: string
+ *                 enum: [TRIAL_USER, PAID_USER, ENTERPRISE_USER]
+ *                 example: TRIAL_USER
+ *                 description: Role to upgrade to
+ *     responses:
+ *       200:
+ *         description: Role upgraded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Upgraded to TRIAL_USER successfully.
+ *                 trialStart:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2025-06-21T12:00:00.000Z
+ *                 trialEnd:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2025-06-28T12:00:00.000Z
+ *                 trialDaysLeft:
+ *                   type: integer
+ *                   example: 7
+ *       400:
+ *         description: Invalid input
+ *       403:
+ *         description: Trial already used or forbidden role upgrade
+ *       500:
+ *         description: Server error
+ */
+
+authrouter.post('/user-role/upgrade', auth, upgradeUserRoleController);
 
 module.exports = authrouter

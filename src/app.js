@@ -6,7 +6,7 @@ const phoneNumberRouter = require('./routes/phonenumber.routes'); // Renamed fro
 const uploadRouter = require('./routes/uploadfile.routes'); // Import the new upload router
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger.config');
-
+const stripeRoutes = require('./routes/paymentStripe.routes')
 const app = express();
 
 // Use morgan for request logging
@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);
 app.use('/api/phonenumber', phoneNumberRouter); // Use renamed variable
 app.use('/api/upload', uploadRouter); // Use the upload router
-
+app.use('/api/payment', stripeRoutes);
 // Serve Swagger UI documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

@@ -1,7 +1,8 @@
 const express = require('express');
 const PhoneNumberSearch = require('../controllers/client/veriphonenumbersearch.controller');
-const {UnAuthUser} = require('../middleware/unAuthUser.middleware');
-const {optionalAuth, auth_ANONYMOUS} = require('../middleware/auth.middleware');
+const {dynamicRateLimiter} = require('../middleware/rateLimit.middleware');
+const {auth_ANONYMOUS,auth} = require('../middleware/auth.middleware');
+
 const phoneNumberRouter = express.Router();
 
 /**
@@ -28,8 +29,7 @@ const phoneNumberRouter = express.Router();
 // authrouter.post('/verify',checkRole('anonymous'),PhoneNumberSearch)
 phoneNumberRouter.post('/verify', 
     auth_ANONYMOUS,
-    UnAuthUser, 
-    optionalAuth,
+    dynamicRateLimiter,
     PhoneNumberSearch
 );
 

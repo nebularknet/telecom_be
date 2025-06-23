@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Role = require('../models/role.model');
-
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 const auth_ANONYMOUS = async (req, res, next) => {
@@ -53,12 +52,12 @@ const auth = async (req, res, next) => {
         // 2. Verify JWT token
         let decoded;
         try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET);
+            decoded = jwt.verify(token, JWT_SECRET);
         } catch (err) {
             if (err.name === 'TokenExpiredError') {
                 return res.status(401).json({ error: 'Token expired. Please log in again.' });
             }
-            return res.status(401).json({ error: 'Invalid token. Please authenticate.' });
+            return res.status(401).json({ error: 'Invalid token. Please log in again.' });
         }
 
         // 3. Find user and populate role
@@ -139,42 +138,9 @@ const optionalAuth = async (req, res, next) => {
 };
 
 
-// Role checking middleware
-const checkRole = (requiredRole,checkpermission) => {
-    return async (req, res, next) => {
-        try {
-            const role = await Role.findOne({ name:requiredRole});
-            console.log('role ====>',role)
-            
-            if (!role) {
-                return res.status(400).json({ message: 'Invalid role specified' });
-            }
-
-            // For anonymous role, allow access without checking user
-            if (role.name === 'ANONYMOUS') {
-                // Check if role has required permissions
-                if (role.permissions.includes('read:public') === checkpermission) {
-                    return next();
-                }
-            }
-            
-            if (role.name !== requiredRole) {
-                return res.status(403).json({ 
-                    message: 'You do not have the required role for this action' 
-                });
-            }
-            
-            next();
-        } catch {
-            return res.status(500).json({ message: 'Error checking role' });
-        }
-    };
-};
-
 
 module.exports = {
     auth,
     auth_ANONYMOUS,
-    checkRole,
     optionalAuth
 };
