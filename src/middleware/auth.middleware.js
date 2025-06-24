@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Role = require('../models/role.model');
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
+const JWT_SECRET = process.env.JWT_SECRET;
+const dotenv = require('dotenv')
+dotenv.config();
 const auth_ANONYMOUS = async (req, res, next) => {
     try {
         // Extract token from Authorization header
@@ -39,54 +40,51 @@ const auth_ANONYMOUS = async (req, res, next) => {
 };
 const auth = async (req, res, next) => {
     try {
-        // 1. Extract token from Authorization header
-        const authHeader = req.header('Authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'Authorization header missing or malformed.' });
+      // Extract token from Authorization header
+      const authHeader = req.header('Authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Authorization header missing or malformed.' });
+      }
+  
+      const token = authHeader.replace('Bearer ', '').trim();
+      if (!token) {
+        return res.status(401).json({ error: 'No token provided.' });
+      }
+  
+      // Verify JWT token
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ error: 'Token expired. Please log in again.' });
         }
-        const token = authHeader.replace('Bearer','').trim();
-        if (!token) {
-            return res.status(401).json({ error: 'No token provided.' });
-        }
-
-        // 2. Verify JWT token
-        let decoded;
-        try {
-            decoded = jwt.verify(token, JWT_SECRET);
-        } catch (err) {
-            if (err.name === 'TokenExpiredError') {
-                return res.status(401).json({ error: 'Token expired. Please log in again.' });
-            }
-            return res.status(401).json({ error: 'Invalid token. Please log in again.' });
-        }
-
-        // 3. Find user and populate role
-        const user = await User.findOne({ _id: decoded.userId});
-        if (!user) {
-            return res.status(401).json({ error: 'User not found or inactive.' });
-        }
-
-        // 4. Attach user and token to request
-        req.token = token;
-        req.user = user;
-
-        // 5. Optionally, check if user has a valid role (could be extended for RBAC)
-        if (!user.role) {
-            return res.status(403).json({ error: 'User role not assigned.' });
-        }
-
-        // 6. Optionally, check if user is required to reset password, etc. (custom logic)
-        // if (user.forcePasswordReset) {
-        //     return res.status(403).json({ error: 'Password reset required.' });
-        // }
-
-        // 7. Continue to next middleware/route
-        next();
+        return res.status(401).json({ error: 'Invalid or expired token.' });
+      }
+  
+      // Find user and populate role
+      const user = await User.findById(decoded.userId).populate('role');
+      if (!user) {
+        return res.status(401).json({ error: 'User not found or inactive.' });
+      }
+  
+      // Attach user and token to request
+      req.token = token;
+      req.user = user;
+      req.userRoleName = user.role?.name || 'UNKNOWN';
+      req.userPermissions = user.role?.permissions || [];
+  
+      // Check if user has a valid role
+      if (!user.role) {
+        return res.status(403).json({ error: 'User role not assigned.' });
+      }
+  
+      // Continue to next middleware/route
+      return next();
     } catch (error) {
-        // 8. Catch-all for unexpected errors
-        res.status(401).json({ error: 'Please authenticate.' });
+      return res.status(401).json({ error: 'Authentication failed. Please try again.' });
     }
-};
+  };
 // Optional authentication middleware for undefined users
 const optionalAuth = async (req, res, next) => {
     try {
