@@ -2,9 +2,9 @@ const fs = require('fs');
 const multer = require('multer');
 const VerificationPhone = require('../models/phonenumber.model');
 
-// Configure multer to accept only JSON files
+// Configure multer to accept only JSON files and use /tmp directory for uploads
 const upload = multer({ 
-    dest: 'uploads/',
+    dest: '/tmp', // Change to /tmp (Vercel allows writing to /tmp)
     fileFilter: (req, file, cb) => {
         if (file.mimetype === 'application/json' || file.originalname.endsWith('.json')) {
             cb(null, true);
@@ -37,7 +37,7 @@ const UploadFile = async (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        filePath = req.file.path;
+        filePath = req.file.path; // File is saved in /tmp
         let fileData;
         let jsonData;
 
@@ -45,6 +45,7 @@ const UploadFile = async (req, res) => {
             fileData = fs.readFileSync(filePath, 'utf8');
             jsonData = JSON.parse(fileData);
         } catch (err) {
+            // Clean up temp file if error occurs
             if (filePath && fs.existsSync(filePath)) {
                 try {
                     fs.unlinkSync(filePath);
@@ -60,6 +61,7 @@ const UploadFile = async (req, res) => {
         }
 
         if (!Array.isArray(jsonData)) {
+            // Clean up temp file if error occurs
             if (filePath && fs.existsSync(filePath)) {
                 try {
                     fs.unlinkSync(filePath);
@@ -74,6 +76,7 @@ const UploadFile = async (req, res) => {
         try {
             transformedData = jsonData.map(record => transformDataToSchema(record));
         } catch (transformError) {
+            // Clean up temp file if error occurs
             if (filePath && fs.existsSync(filePath)) {
                 try {
                     fs.unlinkSync(filePath);
@@ -85,6 +88,7 @@ const UploadFile = async (req, res) => {
         }
 
         if (!VerificationPhone) {
+            // Clean up temp file if error occurs
             if (filePath && fs.existsSync(filePath)) {
                 try {
                     fs.unlinkSync(filePath);
@@ -112,6 +116,7 @@ const UploadFile = async (req, res) => {
             });
         }
 
+        // Clean up temp file after successful upload
         if (filePath && fs.existsSync(filePath)) {
             try {
                 fs.unlinkSync(filePath);
@@ -127,6 +132,7 @@ const UploadFile = async (req, res) => {
 
     } catch (error) {
         process.stderr.write('Unexpected error:', error);
+        // Clean up temp file if error occurs
         if (filePath && fs.existsSync(filePath)) {
             try {
                 fs.unlinkSync(filePath);
