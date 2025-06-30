@@ -1,4 +1,4 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
 
 // Logout Controller
 const logoutController = async (req, res) => {
@@ -24,7 +24,7 @@ const logoutController = async (req, res) => {
     res.status(200).json({ message: "Logout successful." });
 
   } catch (error) {
-    console.error("Logout error:", error);
+    process.stderr.write("Logout error:", error);
     res.status(500).json({ message: "Server error during logout." });
   }
 };

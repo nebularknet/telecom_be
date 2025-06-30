@@ -1,4 +1,4 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
 
 // Get Me Controller
 const getMeController = async (req, res) => {
@@ -21,7 +21,7 @@ const getMeController = async (req, res) => {
     res.status(200).json({ user });
 
   } catch (error) {
-    console.error("Get me error:", error);
+    process.stderr.write("Get me error:", error);
     res.status(500).json({ message: "Server error getting user information." });
   }
 };

@@ -1,10 +1,9 @@
 const express = require('express');
-const PhoneNumberSearch = require('../../controllers/client/veriPhoneNumberSearch');
-const {UnAuthUser} = require('../../middlewares/unAuthUser');
-const {checkRole} = require('../../middlewares/auth');
-const authrouter = express.Router();
+const PhoneNumberSearch = require('../controllers/client/veriphonenumbersearch.controller');
+const {dynamicRateLimiter} = require('../middleware/rateLimit.middleware');
+const {auth_ANONYMOUS,auth} = require('../middleware/auth.middleware');
 
-
+const phoneNumberRouter = express.Router();
 
 /**
  * @swagger
@@ -28,6 +27,11 @@ const authrouter = express.Router();
  *         description: Bad request
  */
 // authrouter.post('/verify',checkRole('anonymous'),PhoneNumberSearch)
-authrouter.post('/verify',checkRole('anonymous'),UnAuthUser,PhoneNumberSearch)
+phoneNumberRouter.post('/verify', 
+    auth_ANONYMOUS,
+    dynamicRateLimiter,
+    PhoneNumberSearch
+);
 
-module.exports=authrouter
+
+module.exports = phoneNumberRouter

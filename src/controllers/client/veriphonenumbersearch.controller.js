@@ -1,16 +1,16 @@
-const PhoneNumberValidation = require("../../models/phonenumberValidation");
+const PhoneNumberValidation = require("../../models/phonenumber.model");
 const { validateAndGetCarrier } = require("../../service/libphonenumber");
 
 const veriphoneNumberSearch = async (req, res) => {
-  const {role} = req.body;  // assuming the role is added to `req.user` after authentication
+  // const {role} = req.body;  // assuming the role is added to `req.user` after authentication
 
   // Ensure user has 'anonymous' role
-  if (role !== 'anonymous') {
-    return res.status(403).json({
-      success: false,
-      message: 'Forbidden: You do not have permission to access this resource.'
-    });
-  }
+  // if (role !== 'anonymous') {
+  //   return res.status(403).json({
+  //     success: false,
+  //     message: 'Forbidden: You do not have permission to access this resource.'
+  //   });
+  // }
   const { phoneNumber } = req.body;
 
   if (!phoneNumber) {
@@ -46,9 +46,10 @@ const veriphoneNumberSearch = async (req, res) => {
     // Send the validation result back in the desired format
     res.json(apiResponse);
   } catch (error) {
-    console.error("Validation error:", error);
+    process.stderr.write("Validation error:", error);
     // Send a generic error response
     res.status(500).json({ error: "An error occurred during validation." });
   }
 };
+
 module.exports = veriphoneNumberSearch;

@@ -1,13 +1,12 @@
 const express = require("express");
 const morgan = require('morgan'); // Import morgan
 const cors = require("cors");
-const authRouter = require("./routes/auth_route");
-const phoneNumberRouter = require('./routes/client/phonenumberRoute'); // Renamed from veriphonenumber
-const uploadRouter = require('./routes/upload_file_route'); // Import the new upload router
-
+const authRouter = require("./routes/auth.routes");
+const phoneNumberRouter = require('./routes/phonenumber.routes'); // Renamed from veriphonenumber
+const uploadRouter = require('./routes/uploadfile.routes'); // Import the new upload router
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
-
+const swaggerSpec = require('./config/swagger.config');
+const stripeRoutes = require('./routes/paymentStripe.routes')
 const app = express();
 
 // Use morgan for request logging
@@ -32,16 +31,19 @@ app.use(
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api", authRouter);
+
+// API Routes
+app.use("/api/auth", authRouter);
 app.use('/api/phonenumber', phoneNumberRouter); // Use renamed variable
 app.use('/api/upload', uploadRouter); // Use the upload router
-
+app.use('/api/payment', stripeRoutes);
 // Serve Swagger UI documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Global error handler
 // This should be the last middleware
 app.use((err, req, res, next) => {
+  // eslint-disable-next-line no-console
   console.error(err.stack); // Log the error stack for debugging
 
   const statusCode = err.statusCode || 500;

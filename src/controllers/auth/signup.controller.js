@@ -1,4 +1,5 @@
-const UserSchemas = require("../../models/users_model");
+const UserSchemas = require("../../models/user.model");
+const Role = require("../../models/role.model");
 const bcryptjs = require("bcryptjs");
 
 /**
@@ -81,93 +82,77 @@ const bcryptjs = require("bcryptjs");
  */
 // Generic Signup Controller
 const signupController = async (req, res) => {
-  // Check if req.body exists before attempting to destructure
-  // NOTE: Ensure express.json() middleware is applied *before* this route in your app setup.
   if (!req.body) {
-    console.error(
-      "Registration error: Request body is missing or empty."
-    );
-    // Send a 400 Bad Request response indicating the issue
-    return res
-      .status(400)
-      .json({ message: "Request body is missing or empty." });
+    process.stderr.write("Registration error: Request body is missing.\n");
+    return res.status(400).json({ message: "Request body is missing or empty." });
   }
 
-  const { fullname, email, password, role } = req.body;
+  let { fullname, email, password, role } = req.body;
 
-  // Basic validation - Ensure required fields are provided
-  if (!fullname || !email || !password || !role) {
-    // Log the received body for debugging partial data issues
-    console.warn("Registration validation failed: Missing fields.", {
-      fullname: !!fullname,
-      email: !!email,
-      password: !!password,
-      role: !!role,
-    });
-    return res
-      .status(400)
-      .json({ message: "Please provide fullname, email, password, and role." });
+  if (!fullname || !email || !password) {
+    process.stderr.write("Registration validation failed: Missing required fields.\n");
+    return res.status(400).json({ message: "Please provide fullname, email, and password." });
   }
 
   try {
-    // Check if a user with the same email already exists
     const existingUser = await UserSchemas.findOne({ email });
     if (existingUser) {
-      // If user exists, return a conflict error
-      console.warn(
-        `Registration conflict: Email ${email} already exists.`
-      );
-      return res
-        .status(409)
-        .json({ message: "User with this email already exists." });
+      process.stderr.write(`Registration conflict: Email ${email} already exists.\n`);
+      return res.status(409).json({ message: "User with this email already exists." });
     }
 
-    // Generate salt and hash the password
+    role = role ? role.toUpperCase() : 'FREE_USER';
+
+    const allowedUserRoles = ['FREE_USER', 'TRIAL_USER', 'PAID_USER', 'ENTERPRISE_USER'];
+    if (!allowedUserRoles.includes(role)) {
+      return res.status(403).json({ message: 'You are not allowed to register with this role.' });
+    }
+
+    const userRole = await Role.findOne({ name: role });
+    if (!userRole) {
+      return res.status(400).json({ message: `Invalid role: ${role}` });
+    }
+
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 
-    // Create a new user instance with hashed password and provided role
     const newUser = new UserSchemas({
       fullname,
       email,
       password: hashedPassword,
-      role
+      role: userRole._id
     });
 
-    // Save the new user to the database
-    await newUser.save();
+    // Save user
+    const savedUser = await newUser.save();
 
-    // Respond with success message and the new user's ID (excluding sensitive info)
-    console.info(
-      `${role} registered successfully: ${newUser.email} (ID: ${newUser._id})`
-    );
-    res
-      .status(201)
-      .json({ message: `${role} registered successfully.`, userId: newUser._id });
+    // Populate role info for response
+    const populatedUser = await UserSchemas.findById(savedUser._id).populate('role');
+
+    process.stderr.write(`User registered: ${populatedUser.email} (ID: ${populatedUser._id})\n`);
+
+    return res.status(201).json({
+      message: 'Registered successfully.',
+      user: {
+        id: populatedUser._id,
+        name: populatedUser.fullname,
+        email: populatedUser.email,
+        role: populatedUser.role.name,
+        permissions: populatedUser.role.permissions // optional
+      }
+    });
+
   } catch (error) {
-    console.error("Registration error:", error);
-    // Handle Mongoose validation errors specifically
+    process.stderr.write("Registration error:\n", error);
     if (error.name === "ValidationError") {
-      // Extract validation error messages
-      const messages = Object.values(error.errors).map((val) => val.message);
-      return res
-        .status(400)
-        .json({ message: `Validation Error: ${messages.join(", ")}` });
+      const messages = Object.values(error.errors).map(val => val.message);
+      return res.status(400).json({ message: `Validation Error: ${messages.join(", ")}` });
     }
-    // Handle potential duplicate key errors from MongoDB (though covered by findOne check)
     if (error.code === 11000) {
-      console.warn(`Registration duplicate key error: ${error.message}`);
-      return res
-        .status(409)
-        .json({
-          message:
-            "User with this email already exists (database constraint).",
-        });
+      return res.status(409).json({ message: "User with this email already exists (duplicate key)." });
     }
-    // Handle generic server errors
-    res
-      .status(500)
-      .json({ message: "Server error during registration." });
+    return res.status(500).json({ message: "Server error during registration." });
   }
 };
+
 module.exports = signupController;
