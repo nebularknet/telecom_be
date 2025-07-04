@@ -1,6 +1,7 @@
 const express = require('express');
 const paymentrouter = express.Router();
 const {handleStripeWebhook} = require('../controllers/paymentStripe/paymentStripe.controller');
+const {handleStripeSubscription} = require('../controllers/paymentStripe/createSubscription.controller');
 const bodyParser = require('body-parser');
 /**
  * @swagger
@@ -28,5 +29,9 @@ const bodyParser = require('body-parser');
  */
 
 paymentrouter.post('/webhook', bodyParser.raw({ type: 'application/json' }), handleStripeWebhook);
+
+paymentrouter.post('/subscription', handleStripeSubscription);
+
+
 
 module.exports = paymentrouter;
